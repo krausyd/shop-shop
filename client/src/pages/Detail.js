@@ -22,12 +22,28 @@ function Detail() {
 
   const { loading, data } = useQuery(QUERY_PRODUCTS);
 
-  const { products } = state;
+  const { cart, products } = state;
   
   const addToCart = () => {
+    const itemInCart = cart.find(item => item._id === id);
+    if (itemInCart) {
+      dispatch({
+        type: UPDATE_CART_QUANTITY,
+        _id: id,
+        purchaseQuantity: itemInCart.purchaseQuantity + 1,
+      });
+    } else {
+      dispatch({
+        type: ADD_TO_CART,
+        product: { ...currentProduct, purchaseQuantity: 1 },
+      });
+    }
+  };
+
+  const removeFromCart =() => {
     dispatch({
-      type: ADD_TO_CART,
-      product: { ...currentProduct, purchaseQuantity: 1 },
+      type: REMOVE_FROM_CART,
+      _id: id,
     });
   };
 
@@ -54,8 +70,8 @@ function Detail() {
 
           <p>
             <strong>Price:</strong>${currentProduct.price}{' '}
-            <button>Add to Cart</button>
-            <button>Remove from Cart</button>
+            <button onClick={addToCart}>Add to Cart</button>
+            <button disabled={!cart.find(p=>p._id === id)} onClick={removeFromCart}>Remove from Cart</button>
           </p>
 
           <img

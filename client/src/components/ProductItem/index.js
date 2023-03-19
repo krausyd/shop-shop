@@ -14,12 +14,24 @@ function ProductItem(item) {
   } = item;
 
   const [state, dispatch] = useStoreContext();
+  const { cart } = state;
 
   const addToCart = () => {
-    dispatch({
-      type: ADD_TO_CART,
-      product: { ...item, purchaseQuantity: 1 },
-    });
+    // update cart if the product was already added 
+    const itemInCart = cart.find(cartItem => cartItem._id === _id);
+
+    if (itemInCart) {
+      dispatch({
+        type: UPDATE_CART_QUANTITY,
+        _id: _id,
+        purchaseQuantity: itemInCart.purchaseQuantity + 1,
+      });
+    } else {
+      dispatch({
+        type: ADD_TO_CART,
+        product: { ...item, purchaseQuantity: 1 },
+      });
+    }
   };
 
   return (

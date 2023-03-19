@@ -9,7 +9,16 @@ const Cart = () => {
     const [state, dispatch] = useStoreContext();
 
     function toggleCart() {
-        dispatch({ type: TOGGLE_CART});
+        dispatch({ type: TOGGLE_CART });
+    }
+
+    function calculateTotal() {
+        let sum = 0;
+        state.cart.forEach(item => {
+            sum += item.price * item.purchaseQuantity;
+        });
+
+        return sum.toFixed(2);
     }
 
     if (state.cartOpen) {
@@ -17,15 +26,17 @@ const Cart = () => {
             <div className="cart">
                 <div className="close" onClick={toggleCart}>[close]</div>
                 <h2>Shopping Cart</h2>
-                <div>
-                    <CartItem item={{ name: 'Camera', image: 'camera.jpg', price: 5, purchaseQuantity: 3 }} />
-                    <CartItem item={{ name: 'Soap', image: 'soap.jpg', price: 6, purchaseQuantity: 4 }} />
-    
-                    <div className="flex-row space-betwee">
-                        <strong>Total: $0</strong>
-                        {Auth.loggedIn ? <button>Checkout</button> : <span>(login to checkout)</span>}
-                    </div>
-                </div>
+                { state.cart.length ? (
+                    <div>
+                        {state.cart.map(item => (
+                            <CartItem key={item._id} item={item} />
+                        ))}
+                        <div className="flex-row space-betwee">
+                            <strong>Total: ${calculateTotal()}</strong>
+                            {Auth.loggedIn ? <button>Checkout</button> : <span>(login to checkout)</span>}
+                        </div>
+                    </div>) :
+                    (<h4><span role="img" aria-label="shocked">😱</span>You haven't added anything to your cart yet!</h4>)}
             </div>
         );
     }
